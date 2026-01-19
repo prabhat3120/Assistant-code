@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Jarvis AI - Prabhat's Assistant</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+
+        #chatbox {
+            width: 100%;
+            height: 400px;
+            background: #1e1e1e;
+            padding: 15px;
+            overflow-y: scroll;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+
+        #userInput {
+            width: 75%;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            background-color: #2e2e2e;
+            color: #e0e0e0;
+        }
+
+        #sendBtn,
+        #voiceBtn {
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 8px;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5);
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+        }
+
+        #sendBtn:hover,
+        #voiceBtn:hover {
+            background: linear-gradient(90deg, #3a7bd5, #00d2ff);
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Welcome Prabhat! I'm Your Jarvis AI</h1>
+    <div id="chatbox"></div><br>
+    <input type="text" id="userInput" placeholder="Type your command here..."/>
+    <button id="sendBtn" onclick="getResponse()">Send</button>
+    <button id="voiceBtn" onclick="startListening()">🎤 Speak</button>
+
+    <script>
+        let todoList = [];
+
+        // AI-Like Natural Voice Output
+        function speak(message) {
+            var speech = new SpeechSynthesisUtterance();
+            speech.text = message;
+            speech.lang = "hi-IN";
+            speech.rate = 1;
+            speech.pitch = 1.2; // Natural pitch adjustment
+            speech.volume = 1;
+            window.speechSynthesis.speak(speech);
+        }
+
+        // Voice Input Function
+        function starLtistening() {
+            if (!('webkitSpeechRecognition' in window)) {
+                alert("Your browser doesn't support speech recognition.");
+                return;
+            }
+            var recognition = new webkitSpeechRecognition();
+            recognition.lang = "hi-IN";
+            recognition.onresult = function (event) {
+                var userMessage = event.results[0][0].transcript;
+                document.getElementById("userInput").value = userMessage;
+                getResponse();
+            };
+            recognition.start();
+        }
+
+        // Chat Function with Enhanced AI-Like Responses
+        function getResponse() {
+            var userMessage = document.getElementById("userInput").value;
+            var chatbox = document.getElementById("chatbox");
+            chatbox.innerHTML += `<p><strong>Prabhat:</strong> ${userMessage}</p>`;
+
+            let botResponse = "Hmm... मुझे समझ नहीं आया, Prabhat।";
+
+            if (userMessage.toLowerCase().includes("hello") || userMessage.toLowerCase().includes("hi")) {
+                botResponse = "अरे Prabhat! क्या हाल चाल हैं? 😄";
+            } else if (userMessage.toLowerCase().includes("good morning")) {
+                botResponse = "Good Morning, Prabhat! दिन की शुरुआत शानदार हो! ☀️";
+            } else if (userMessage.toLowerCase().includes("time") || userMessage.toLowerCase().includes("samay")) {
+                botResponse = "अभी का समय है " + new Date().toLocaleTimeString();
+            } else if (userMessage.toLowerCase().includes("date") || userMessage.toLowerCase().includes("tarikh")) {
+                botResponse = "आज की तारीख है " + new Date().toLocaleDateString();
+            }
+            // To-Do List
+            else if (userMessage.toLowerCase().includes("add task") || userMessage.toLowerCase().includes("kaam jodo")) {
+                let task = userMessage.substring(9);
+                todoList.push(task);
+                botResponse = `बिल्कुल! मैंने ये टास्क जोड़ दिया: ${task}`;
+            } else if (userMessage.toLowerCase().includes("show tasks") || userMessage.toLowerCase().includes("kaam dikhaiye")) {
+                botResponse = todoList.length ? "ये रहे आपके टास्क: " + todoList.join(", ") : "अभी तक कोई टास्क नहीं है, Prabhat।";
+            }
+            // Calculator
+            else if (userMessage.match(/[0-9+\-*/().]+/)) {
+                try {
+                    let result = eval(userMessage);
+                    botResponse = `Calculation का result है: ${result}`;
+                } catch {
+                    botResponse = "कुछ गड़बड़ हो गई calculation में।";
+                }
+            }
+            // Google Search
+            else if (userMessage.toLowerCase().includes("search for") || userMessage.toLowerCase().includes("google kholo")) {
+                let query = userMessage.substring(userMessage.toLowerCase().includes("search for") ? 10 : 12);
+                window.open(`https://www.google.com/search?q=${query}`, "_blank");
+                botResponse = `ठीक है Prabhat, मैं Google पर ये सर्च कर रहा हूँ: ${query}`;
+
+             } else if (userMessage.toLowerCase().includes("search for") || userMessage.toLowerCase().includes("youtube kholo")) {
+                let query = userMessage.substring(userMessage.toLowerCase().includes("search for") ? 10 : 12);
+                window.open(`https://www.youtube.com/search?q=${query}`, "_blank");
+                botResponse = `ठीक है Prabhat, मैं ye khol raha hu Google पर ये सर्च कर रहा हूँ: ${query}`;
+           
+            }
+            // Fun Response
+            else if (userMessage.toLowerCase().includes("i am iron man")) {
+                botResponse = "और मैं... अनंतकाल हूँ। 😉";
+            }
+
+            // Display Response
+            chatbox.innerHTML += `<p><strong>Jarvis:</strong> ${botResponse}</p>`;
+            speak(botResponse);
+
+            document.getElementById("userInput").value = "";
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+    </script>
+
+</body>
+
+</html>
